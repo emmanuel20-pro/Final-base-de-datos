@@ -1,0 +1,305 @@
+package proyectoFinal;
+
+import java.sql.*;
+import java.util.Scanner;
+
+public class Java {
+    private Connection connection;
+    private Scanner scanner;
+
+    public static void main(String[] args) {
+        Java app = new Java();
+        app.conectar();
+        app.menuPrincipal();
+    }
+
+    private void conectar() {
+        scanner = new Scanner(System.in);
+        try {
+            String url = "jdbc:mysql://localhost:3306/avancedeproyecto";
+            String username = "root";
+            String password = "SpotifyPremium8/{}"; 
+            connection = DriverManager.getConnection(url, username, password);
+            System.out.println(" Conectado a la base de datos");
+        } catch (SQLException e) {
+            System.out.println(" Error de conexión: " + e.getMessage());
+        }
+    }
+
+    // ==================== MENÚ PRINCIPAL ====================
+    private void menuPrincipal() {
+        int opcion;
+        do {
+            System.out.println("\n=== MENÚ PRINCIPAL ===");
+            System.out.println("1. Clientes");
+            System.out.println("2. Proveedores");
+            System.out.println("3. Productos");
+            System.out.println("4. Pedidos");
+            System.out.println("5. Salir");
+            System.out.print("Selecciona una opción: ");
+            opcion = Integer.parseInt(scanner.nextLine());
+
+            switch (opcion) {
+                case 1 -> menuClientes();
+                case 2 -> menuProveedores();
+                case 3 -> menuProductos();
+                case 4 -> menuPedidos();
+                case 5 -> System.out.println(" Saliendo");
+                default -> System.out.println(" Opción no válida");
+            }
+        } while (opcion != 5);
+    }
+
+    // ==================== MENÚ CLIENTES ====================
+    private void menuClientes() {
+        int opcion;
+        do {
+            System.out.println("\n--- MENÚ CLIENTES ---");
+            System.out.println("1. Insertar cliente");
+            System.out.println("2. Listar clientes");
+            System.out.println("3. Actualizar cliente");
+            System.out.println("4. Eliminar cliente");
+            System.out.println("5. Volver");
+            System.out.print("Opción: ");
+            opcion = Integer.parseInt(scanner.nextLine());
+
+            switch (opcion) {
+                case 1 -> insertarCliente();
+                case 2 -> listar("Clientes");
+                case 3 -> actualizar("Clientes", "telefono", "id_cliente");
+                case 4 -> eliminar("Clientes", "id_cliente");
+            }
+        } while (opcion != 5);
+    }
+
+    // ==================== MENÚ PROVEEDORES ====================
+    private void menuProveedores() {
+        int opcion;
+        do {
+            System.out.println("\n--- MENÚ PROVEEDORES ---");
+            System.out.println("1. Insertar proveedor");
+            System.out.println("2. Listar proveedores");
+            System.out.println("3. Actualizar proveedor");
+            System.out.println("4. Eliminar proveedor");
+            System.out.println("5. Volver");
+            System.out.print("Opción: ");
+            opcion = Integer.parseInt(scanner.nextLine());
+
+            switch (opcion) {
+                case 1 -> insertarProveedor();
+                case 2 -> listar("Proveedores");
+                case 3 -> actualizar("Proveedores", "telefono", "id_proveedor");
+                case 4 -> eliminar("Proveedores", "id_proveedor");
+            }
+        } while (opcion != 5);
+    }
+
+    // ==================== MENÚ PRODUCTOS ====================
+    private void menuProductos() {
+        int opcion;
+        do {
+            System.out.println("\n--- MENÚ PRODUCTOS ---");
+            System.out.println("1. Insertar producto");
+            System.out.println("2. Listar productos");
+            System.out.println("3. Actualizar producto");
+            System.out.println("4. Eliminar producto");
+            System.out.println("5. Volver");
+            System.out.print("Opción: ");
+            opcion = Integer.parseInt(scanner.nextLine());
+
+            switch (opcion) {
+                case 1 -> insertarProducto();
+                case 2 -> listar("Productos");
+                case 3 -> actualizar("Productos", "precio", "id_producto");
+                case 4 -> eliminar("Productos", "id_producto");
+            }
+        } while (opcion != 5);
+    }
+
+    // ==================== MENÚ PEDIDOS ====================
+    private void menuPedidos() {
+        int opcion;
+        do {
+            System.out.println("\n--- MENÚ PEDIDOS ---");
+            System.out.println("1. Insertar pedido");
+            System.out.println("2. Listar pedidos");
+            System.out.println("3. Eliminar pedido");
+            System.out.println("4. Volver");
+            System.out.print("Opción: ");
+            opcion = Integer.parseInt(scanner.nextLine());
+
+            switch (opcion) {
+                case 1 -> insertarPedido();
+                case 2 -> listar("Pedidos");
+                case 3 -> eliminar("Pedidos", "id_pedido");
+            }
+        } while (opcion != 4);
+    }
+
+    // ==================== CRUD CLIENTES ====================
+    private void insertarCliente() {
+        try {
+            System.out.print("Nombre: ");
+            String nombre = scanner.nextLine();
+            System.out.print("Apellido paterno: ");
+            String apPaterno = scanner.nextLine();
+            System.out.print("Apellido materno: ");
+            String apMaterno = scanner.nextLine();
+            System.out.print("Teléfono: ");
+            String telefono = scanner.nextLine();
+            System.out.print("Email: ");
+            String email = scanner.nextLine();
+            System.out.print("Dirección: ");
+            String direccion = scanner.nextLine();
+
+            String sql = "INSERT INTO Clientes (nombre, ap_paterno, ap_materno, telefono, email, direccion) VALUES (?, ?, ?, ?, ?, ?)";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, nombre);
+            ps.setString(2, apPaterno);
+            ps.setString(3, apMaterno);
+            ps.setString(4, telefono);
+            ps.setString(5, email);
+            ps.setString(6, direccion);
+            ps.executeUpdate();
+
+            System.out.println(" Cliente insertado correctamente.");
+        } catch (SQLException e) {
+            System.out.println(" Error al insertar cliente: " + e.getMessage());
+        }
+    }
+
+    // ====================  PROVEEDORES ====================
+    private void insertarProveedor() {
+        try {
+            System.out.print("Nombre empresa: ");
+            String empresa = scanner.nextLine();
+            System.out.print("Teléfono: ");
+            String telefono = scanner.nextLine();
+            System.out.print("Email: ");
+            String email = scanner.nextLine();
+
+            String sql = "INSERT INTO Proveedores (nombre_empresa, telefono, email) VALUES (?, ?, ?)";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, empresa);
+            ps.setString(2, telefono);
+            ps.setString(3, email);
+            ps.executeUpdate();
+
+            System.out.println(" Proveedor insertado correctamente.");
+        } catch (SQLException e) {
+            System.out.println(" Error al insertar proveedor: " + e.getMessage());
+        }
+    }
+
+    // ==================== CRUD PRODUCTOS ====================
+    private void insertarProducto() {
+        try {
+            System.out.print("Nombre producto: ");
+            String nombre = scanner.nextLine();
+            System.out.print("Precio: ");
+            double precio = Double.parseDouble(scanner.nextLine());
+            System.out.print("Stock: ");
+            int stock = Integer.parseInt(scanner.nextLine());
+
+            String sql = "INSERT INTO Productos (nombre, precio, stock) VALUES (?, ?, ?)";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, nombre);
+            ps.setDouble(2, precio);
+            ps.setInt(3, stock);
+            ps.executeUpdate();
+
+            System.out.println(" Producto insertado correctamente.");
+        } catch (SQLException e) {
+            System.out.println(" Error al insertar producto: " + e.getMessage());
+        }
+    }
+
+    // ==================== CRUD PEDIDOS ====================
+    private void insertarPedido() {
+        try {
+            System.out.print("ID Cliente: ");
+            int idCliente = Integer.parseInt(scanner.nextLine());
+            System.out.print("ID Producto: ");
+            int idProducto = Integer.parseInt(scanner.nextLine());
+            System.out.print("Cantidad: ");
+            int cantidad = Integer.parseInt(scanner.nextLine());
+
+            String sql = "INSERT INTO Pedidos (id_cliente, id_producto, cantidad) VALUES (?, ?, ?)";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, idCliente);
+            ps.setInt(2, idProducto);
+            ps.setInt(3, cantidad);
+            ps.executeUpdate();
+
+            System.out.println(" Pedido insertado correctamente.");
+        } catch (SQLException e) {
+            System.out.println(" Error al insertar pedido: " + e.getMessage());
+        }
+    }
+
+    // ==================== MÉTODOS GENÉRICOS ====================
+    private void listar(String tabla) {
+        try {
+            String sql = "SELECT * FROM " + tabla;
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+
+            System.out.println("\n Lista de " + tabla + ":");
+            ResultSetMetaData meta = rs.getMetaData();
+            int columnas = meta.getColumnCount();
+
+            while (rs.next()) {
+                for (int i = 1; i <= columnas; i++) {
+                    System.out.print(rs.getString(i) + " | ");
+                }
+                System.out.println();
+            }
+        } catch (SQLException e) {
+            System.out.println(" Error al listar " + tabla + ": " + e.getMessage());
+        }
+    }
+
+    private void actualizar(String tabla, String campo, String idCampo) {
+        try {
+            System.out.print("ID a actualizar: ");
+            int id = Integer.parseInt(scanner.nextLine());
+            System.out.print("Nuevo valor para " + campo + ": ");
+            String valor = scanner.nextLine();
+
+            String sql = "UPDATE " + tabla + " SET " + campo + " = ? WHERE " + idCampo + " = ?";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, valor);
+            ps.setInt(2, id);
+
+            int filas = ps.executeUpdate();
+            if (filas > 0) {
+                System.out.println(" Registro actualizado correctamente.");
+            } else {
+                System.out.println(" No se encontró el registro.");
+            }
+        } catch (SQLException e) {
+            System.out.println(" Error al actualizar: " + e.getMessage());
+        }
+    }
+
+    private void eliminar(String tabla, String idCampo) {
+        try {
+            System.out.print("ID a eliminar: ");
+            int id = Integer.parseInt(scanner.nextLine());
+
+            String sql = "DELETE FROM " + tabla + " WHERE " + idCampo + " = ?";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, id);
+
+            int filas = ps.executeUpdate();
+            if (filas > 0) {
+                System.out.println(" Registro eliminado correctamente.");
+            } else {
+                System.out.println(" No se encontró el registro.");
+            }
+        } catch (SQLException e) {
+            System.out.println(" Error al eliminar: " + e.getMessage());
+        }
+    }
+}
+
